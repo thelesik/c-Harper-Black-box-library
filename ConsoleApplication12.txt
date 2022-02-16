@@ -1,0 +1,131 @@
+#include <math.h>
+#include <iostream>
+#include <iomanip>
+#include <cstdlib>
+#include<vector>
+#include <fstream>
+#include <sstream>
+#define M_PI 3.1415926535897932
+
+using namespace std;
+
+string ReadFromFile() {
+    string file, temp, newfile;
+    int check = 0;
+    vector<string> text_file1;
+Check1: // goto loop, used safely
+    cout << "Please input source file name\n";
+    cin >> file;
+    ifstream ifs(file);
+    if (ifs.is_open()) {
+        while (getline(ifs, temp))
+            text_file1.push_back(temp);
+    }
+    else {
+        cout << "Error, The file does not exist \n";
+        goto Check1; // goto
+    }
+    return text_file1[0];
+}
+
+double Outputfile(double point, double Angle, double Velocity) {
+    fstream outfile;
+    double g = 32, R, T, H, X, Y, C = 0, P;
+    string file;
+    string choice;
+    int  check = 0;
+Check2: // goto loop, used safely
+    cout << "What is the name of output file \n";
+    cin >> file;
+    ifstream ifs(file);
+    if (ifs.is_open()) {
+    }
+    else {
+        cout << "Error, The file does not exist \n";
+        goto Check2; //goto check2
+    }
+    outfile.open(file);
+    if (outfile.is_open()) {
+        cout << "Do you want to overwrite the existing file(press 1) or append to it(press 2) ";
+        cin >> choice;
+        if (choice == "1") {
+            outfile.close();
+            outfile.open(file, std::ofstream::out | std::ofstream::trunc);
+            Angle = Angle * M_PI / 180;
+            R = (pow(Velocity, 2) * sin(2 * Angle)) / g; // distance formula
+            T = R / (Velocity * cos(Angle));
+            H = (Velocity * sin(Angle)) * (T / 2) - 0.5 * g * pow(T / 2, 2);
+            outfile << " Distance traveled in feet = " << R << "\n Time spent in the air in seconds = " << T << "\n Maximum height in feet = " << H << "\n\n\n\n";
+            for (double i = 0; i <= point; i++)
+            {
+                X = (Velocity * cos(Angle)) * C;
+                Y = (Velocity * sin(Angle)) * C - 0.5 * g * pow(C, 2);
+                outfile << fixed <<  setprecision(3) << setw(10) << C << setw(15) << X << setw(15) << Y << "\n"; // double cutted for 5 digits after coma for better visualization
+                C = C + T / 20;
+            }
+
+
+        }
+        else if (choice == "2") {
+            outfile.close();
+            outfile.open(file, std::ios_base::app);
+            Angle = Angle * M_PI / 180;
+            R = (pow(Velocity, 2) * sin(2 * Angle)) / g; // distance formula
+            T = R / (Velocity * cos(Angle));
+            H = (Velocity * sin(Angle)) * (T / 2) - 0.5 * g * pow(T / 2, 2);
+            outfile << " Distance traveled in feet = " << R << "\n Time spent in the air in seconds = " << T << "\n Maximum height in feet = " << H << "\n\n\n\n";
+            for (double i = 0; i <= point; i++)
+            {
+                X = (Velocity * cos(Angle)) * C;
+                Y = (Velocity * sin(Angle)) * C - 0.5 * g * pow(C, 2);
+                outfile << fixed << setprecision(3) << setw(10) << C << setw(15) << X << setw(15) << Y << "\n"; // double cutted for 5 digits after coma for better visualization
+                C = C + T / 20;
+            }
+            outfile.close();
+        }
+        else { cout << "wrond entrance, please rerun the program";
+        exit(0);
+
+        }
+    }
+    else {
+        cout << "Error file doesnt exist \n"; // additional check, should never appear
+        exit(0);
+    }
+    return 0;
+}
+double InputWithControl()
+{
+    double Angle, Velocity, points;
+    string input, file;
+    input = ReadFromFile();
+    input = input + " ";
+    string delim = " ";
+    vector<string> words{};
+    size_t pos = 0;
+    while ((pos = input.find(delim)) != string::npos) {
+        words.push_back(input.substr(0, pos));
+        input.erase(0, pos + delim.length());
+    }
+    char* c = const_cast<char*>(words[0].c_str());
+    Angle = atof(c);
+    char* b = const_cast<char*>(words[1].c_str());
+    Velocity = atof(b);
+    char* a = const_cast<char*>(words[2].c_str());
+    points = atof(a);
+    if (Velocity <= 0) {
+        cout << "Your velocity is negative, please change it and rerun the program";
+        exit(0);
+    }
+    Velocity = Velocity * 1.4666667;
+    if (Angle >= 90 || Angle <= 0) {
+        cout << "Please input cannon angle beyween 0 and 90, please change it and rerun the program\n";
+        exit(0);
+    }
+    Outputfile(points, Angle, Velocity);
+    return 0;
+}
+int main()
+{
+    InputWithControl();
+}    

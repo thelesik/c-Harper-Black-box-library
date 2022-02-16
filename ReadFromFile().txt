@@ -1,0 +1,18 @@
+string ReadFromFile() {
+    string file, temp, newfile;
+    int check = 0;
+    vector<string> text_file1;
+Check1: // goto loop, used safely
+    cout << "Please input source file name\n";
+    cin >> file;
+    ifstream ifs(file);
+    if (ifs.is_open()) {
+        while (getline(ifs, temp))
+            text_file1.push_back(temp);
+    }
+    else {
+        cout << "Error, The file does not exist \n";
+        goto Check1; // goto
+    }
+    return text_file1[0];
+}
